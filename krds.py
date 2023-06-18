@@ -47,6 +47,7 @@ class KindleReaderDataStore(object):
     SIGNATURE = b"\x00\x00\x00\x00\x00\x1A\xB1\x26"
 
     def __init__(self, log, data=None):
+        self.krds = None
         self.log = log
         self.data = data    # for deserialize
 
@@ -150,6 +151,15 @@ class KindleReaderDataStore(object):
 
         return value
 
+    ANNOT_CLASS_NAMES = {
+        0: "annotation.personal.bookmark",
+        1: "annotation.personal.highlight",
+        2: "annotation.personal.note",
+        3: "annotation.personal.clip_article",  # value not verified
+        10: "annotation.personal.handwritten_note",
+        11: "annotation.personal.sticky_note",
+    }
+
     def decode_object(self, name, val):
         obj = collections.OrderedDict()
 
@@ -190,16 +200,9 @@ class KindleReaderDataStore(object):
             obj["device"] = val.pop(0)
 
         elif name == "annotation.cache.object":
-            ANNOT_CLASS_NAME = {
-                0: "annotation.personal.bookmark",
-                1: "annotation.personal.highlight",
-                2: "annotation.personal.note",
-                3: "annotation.personal.clip_article",     # value not verified
-                }
-
             for _ in range(val.pop(0)):
                 annotation_type = val.pop(0)
-                annot_class_name = ANNOT_CLASS_NAME.get(annotation_type)
+                annot_class_name = self.ANNOT_CLASS_NAMES.get(annotation_type)
                 if annot_class_name is None:
                     raise Exception("Unknown annotation type %d" % annotation_type)
 
