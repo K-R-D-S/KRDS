@@ -64,7 +64,7 @@ class KindleReaderDataStore(object):
         value_cnt = self.decode_next()
         value = collections.OrderedDict()
 
-        for i in range(value_cnt):
+        for _ in range(value_cnt):
             try:
                 val = self.decode_next()
             except Exception:
@@ -159,7 +159,7 @@ class KindleReaderDataStore(object):
             obj = val.pop(0)    # single value
 
         elif name in {"dict.prefs.v2", "EndActions", "ReaderMetrics", "StartActions", "Translator", "Wikipedia"}:
-            for i in range(val.pop(0)):     # key/value pairs
+            for _ in range(val.pop(0)):     # key/value pairs
                 k = val.pop(0)
                 obj[k] = val.pop(0)
 
@@ -197,7 +197,7 @@ class KindleReaderDataStore(object):
                 3: "annotation.personal.clip_article",     # value not verified
                 }
 
-            for i in range(val.pop(0)):
+            for _ in range(val.pop(0)):
                 annotation_type = val.pop(0)
                 annot_class_name = ANNOT_CLASS_NAME.get(annotation_type)
                 if annot_class_name is None:
@@ -213,7 +213,7 @@ class KindleReaderDataStore(object):
                 obj[annot_class_name] = annotations
 
         elif name == "saved.avl.interval.tree":
-            obj = [val.pop(0) for i in range(val.pop(0))]   # annotation.personal.xxx
+            obj = [val.pop(0) for _ in range(val.pop(0))]   # annotation.personal.xxx
 
         elif name in {"annotation.personal.bookmark", "annotation.personal.highlight", "annotation.personal.note",
                       "annotation.personal.clip_article"}:
@@ -230,7 +230,7 @@ class KindleReaderDataStore(object):
             obj["asin"] = val.pop(0)        # typically ISBN of print edition source of page numbers
             obj["cdeType"] = val.pop(0)
             obj["sidecarAvailable"] = val.pop(0)
-            obj["oPNToPosition"] = [val.pop(0) for i in range(val.pop(0))]
+            obj["oPNToPosition"] = [val.pop(0) for _ in range(val.pop(0))]
             obj["first"] = val.pop(0)       # int
             obj["unknown1"] = val.pop(0)    # int
             obj["unknown2"] = val.pop(0)    # int
@@ -304,10 +304,10 @@ class KindleReaderDataStore(object):
             obj["averageCalculator"] = val.pop(0)["timer.average.calculator"]
 
         elif name == "timer.average.calculator":
-            obj["samples1"] = [val.pop(0) for i in range(val.pop(0))]   # doubles
-            obj["samples2"] = [val.pop(0) for i in range(val.pop(0))]   # doubles
-            obj["normalDistributions"] = [val.pop(0)["timer.average.calculator.distribution.normal"] for i in range(val.pop(0))]
-            obj["outliers"] = [val.pop(0)["timer.average.calculator.outliers"] for i in range(val.pop(0))]
+            obj["samples1"] = [val.pop(0) for _ in range(val.pop(0))]   # doubles
+            obj["samples2"] = [val.pop(0) for _ in range(val.pop(0))]   # doubles
+            obj["normalDistributions"] = [val.pop(0)["timer.average.calculator.distribution.normal"] for _ in range(val.pop(0))]
+            obj["outliers"] = [val.pop(0)["timer.average.calculator.outliers"] for _ in range(val.pop(0))]
 
         elif name == "timer.average.calculator.distribution.normal":
             obj["count"] = val.pop(0)           # long
@@ -315,14 +315,14 @@ class KindleReaderDataStore(object):
             obj["sumOfSquares"] = val.pop(0)    # double
 
         elif name == "timer.average.calculator.outliers":
-            obj = [val.pop(0) for i in range(val.pop(0))]   # doubles
+            obj = [val.pop(0) for _ in range(val.pop(0))]   # doubles
 
         elif name == "book.info.store":
             obj["numberOfWords"] = val.pop(0)           # long, Num words known in book
             obj["percentOfBook"] = val.pop(0)           # double, Percentage of book for the known words
 
         elif name == "page.history.store":
-            obj = [val.pop(0)["page.history.record"] for i in range(val.pop(0))]
+            obj = [val.pop(0)["page.history.record"] for _ in range(val.pop(0))]
 
         elif name == "page.history.record":
             obj["position"] = self.decode_position(val.pop(0))
