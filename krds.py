@@ -15,8 +15,11 @@ import sys
 __license__ = "GPL v3"
 __copyright__ = "2019, John Howell <jhowell@acm.org>"
 
-# 1.0 - 2019-08-12 - Initial release
+# 1.1 - 2023-06-18 - tomsem additions for kindle Scribe
 
+# For background and change history, see:
+# https://www.mobileread.com/forums/showthread.php?t=322172
+# https://github.com/K-R-D-S/KRDS
 
 def main():
     parser = argparse.ArgumentParser(prog="python krds.py", description="Convert Kindle reader data store files to JSON")
@@ -227,6 +230,10 @@ class KindleReaderDataStore(object):
 
             if name == "annotation.personal.note":
                 obj["note"] = val.pop(0)
+            elif name == "annotation.personal.handwritten_note":
+                obj["handwritten_note_nbk_ref"] = val.pop(0)
+            elif name == "annotation.personal.sticky_note":
+                obj["sticky_note_nbk_ref"] = val.pop(0)
 
         elif name == "apnx.key":
             obj["asin"] = val.pop(0)        # typically ISBN of print edition source of page numbers
@@ -282,6 +289,9 @@ class KindleReaderDataStore(object):
 
             if len(val):
                 obj["readingPresetSelected"] = val.pop(0)   # string
+
+            if len(val):
+                obj["unknown2"] = val.pop(0)
 
         elif name == "purchase.state.data":
             obj["state"] = val.pop(0)           # string
@@ -348,7 +358,8 @@ class KindleReaderDataStore(object):
 
         return {name: obj}
 
-    def decode_position(self, position):
+    @staticmethod
+    def decode_position(position):
         return position
 
 
