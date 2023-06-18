@@ -218,8 +218,7 @@ class KindleReaderDataStore(object):
         elif name == "saved.avl.interval.tree":
             obj = [val.pop(0) for _ in range(val.pop(0))]   # annotation.personal.xxx
 
-        elif name in {"annotation.personal.bookmark", "annotation.personal.highlight", "annotation.personal.note",
-                      "annotation.personal.clip_article"}:
+        elif name in self.ANNOT_CLASS_NAMES.values():
             obj["startPosition"] = self.decode_position(val.pop(0))
             obj["endPosition"] = self.decode_position(val.pop(0))
             obj["creationTime"] = datetime.datetime.fromtimestamp(val.pop(0) / 1000.0).isoformat()
