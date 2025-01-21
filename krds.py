@@ -161,6 +161,7 @@ class KindleReaderDataStore(object):
         3: "annotation.personal.clip_article",  # value not verified
         10: "annotation.personal.handwritten_note",
         11: "annotation.personal.sticky_note",
+        13: "annotation.personal.underline",
     }
 
     def decode_object(self, name, val):
