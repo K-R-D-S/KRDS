@@ -165,6 +165,17 @@ class KindleReaderDataStore(object):
     }
 
     def decode_object(self, name, val):
+        # Object sub-values are fully read before this is called (the byte
+        # stream is already past OBJECT_END), so on any format drift we can
+        # safely fall back to the raw value list without corrupting decoding.
+        raw = list(val)
+        try:
+            return {name: self._decode_known(name, val)}
+        except Exception as e:
+            self.log.warning("raw fallback for structure %s: %s" % (name, repr(e)))
+            return {name: raw}
+
+    def _decode_known(self, name, val):
         obj = collections.OrderedDict()
 
         if name in {
@@ -355,9 +366,15 @@ class KindleReaderDataStore(object):
             val = []
 
         if len(val):
-            raise Exception("Excess values found for structure %s: %s" % (name, repr(val)))
+            # Newer firmware (e.g. 5.18.x) adds trailing fields this parser
+            # doesn't know. Object framing is delimiter-based (OBJECT_END),
+            # so draining leftovers here is safe and keeps the stream aligned.
+            self.log.warning("Excess values for structure %s (newer firmware?): %s" % (name, repr(val)))
+            if isinstance(obj, dict):
+                obj["_unparsed_trailing"] = list(val)
+            val[:] = []
 
-        return {name: obj}
+        return obj
 
     @staticmethod
     def decode_position(position):
